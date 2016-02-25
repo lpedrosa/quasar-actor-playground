@@ -24,4 +24,5 @@ public class WorkerActor extends ServerActor<WorkerCallMessage, String, WorkerCa
         else
             throw new WorkerException("I'm pretty useless at that... [taskType:" + m.getTaskType() + "]");
     }
+
 }

@@ -1,5 +1,9 @@
 package io.github.lpedrosa.worker;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
+
+import co.paralleluniverse.actors.LocalActor;
 import co.paralleluniverse.actors.behaviors.Server;
 import co.paralleluniverse.common.util.Exceptions;
 import co.paralleluniverse.fibers.FiberFactory;
@@ -8,13 +12,18 @@ import co.paralleluniverse.fibers.SuspendExecution;
 import io.github.lpedrosa.worker.messages.DoSomeWork;
 import io.github.lpedrosa.worker.messages.WorkerCallMessage;
 import io.github.lpedrosa.worker.messages.WorkerCastMessage;
+
+import java.util.concurrent.ExecutionException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkerActorSendCallTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WorkerActorSendCallTest.class);
 
     private static final FiberFactory TEST_SCHEDULER = new FiberForkJoinScheduler("test-scheduler", 4);
 
@@ -29,6 +38,11 @@ public class WorkerActorSendCallTest {
     @After
     public void tearDown() {
         this.server.shutdown();
+        try {
+            LocalActor.join(this.server);
+        } catch (ExecutionException | InterruptedException e) {
+            LOG.warn("Exception while waiting for actor to join:", e);
+        }
     }
 
     @Test
